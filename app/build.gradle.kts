@@ -2,24 +2,18 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-
-    // Kapt inherits the version from the alias above, so no version is needed here
-    id("kotlin-kapt")
-
-    // Serialization still needs its explicit version
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.10"
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "edu.nd.pmcburne.hwapp.one"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "edu.nd.pmcburne.hwapp.one"
         minSdk = 27
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -62,17 +56,17 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // --- RETROFIT & NETWORK ---
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // --- ROOM DATABASE (For Offline Mode) ---
-    val roomVersion = "2.8.4"
+    val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
+    ksp("androidx.room:room-compiler:$roomVersion")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 }
 
 kotlin {
