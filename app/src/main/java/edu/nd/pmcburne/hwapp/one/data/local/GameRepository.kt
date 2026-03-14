@@ -1,34 +1,39 @@
-package edu.nd.pmcburne.hwapp.one.data.local
+package edu.nd.pmcburne.hwapp.one.data
 
-import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import android.util.Log
+import edu.nd.pmcburne.hwapp.one.data.local.GameDao
+import edu.nd.pmcburne.hwapp.one.data.local.GameEntity
+import kotlinx.coroutines.flow.Flow
 
-// 1. The @Database annotation lists the entities (tables) and the version number.
-// If you ever change the GameEntity class later, you would increase the version number.
-@Database(entities = [GameEntity::class], version = 1, exportSchema = false)
-abstract class AppDatabase : RoomDatabase() {
+class GameRepository(
+    private val apiService: NcaaApiService,
+    private val gameDao: GameDao
+) {
+    fun getGamesStream(dateSelected: String, gender: String): Flow<List<GameEntity>> {
+        return gameDao.getGames(dateSelected, gender)
+    }
 
-    // 2. This function gives the rest of your app access to the SQL commands you wrote
-    abstract fun gameDao(): GameDao
-
-    // 3. The Singleton pattern to ensure only one database instance exists
-    companion object {
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-
-        fun getDatabase(context: Context): AppDatabase {
-            // If the instance already exists, return it. If not, create it.
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "ncaa_scores_database" // The name of the local SQLite file
-                ).build()
-                INSTANCE = instance
-                instance
+    suspend fun refreshGames(gender: String, year: String, month: String, day: String, dateString: String) {
+        try {
+            val response = apiService.getScores(gender, year, month, day)
+            val entitiesToSave = response.games.map { wrapper ->
+                val game = wrapper.game
+                GameEntity(
+                    gameId = game.gameId,
+                    dateSelected = dateString,
+                    gender = gender,
+                    homeTeamName = game.homeTeam.names.shortName,
+                    homeTeamScore = game.homeTeam.score,
+                    awayTeamName = game.awayTeam.names.shortName,
+                    awayTeamScore = game.awayTeam.score,
+                    gameState = game.gameState,
+                    currentPeriod = game.currentPeriod,
+                    contestClock = game.contestClock
+                )
             }
+            gameDao.insertGames(entitiesToSave)
+        } catch (e: Exception) {
+            Log.e("GameRepository", "Network fetch failed: ${e.message}")
         }
     }
 }
