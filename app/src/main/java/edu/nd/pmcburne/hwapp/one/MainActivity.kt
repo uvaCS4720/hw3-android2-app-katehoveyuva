@@ -22,16 +22,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            setContent {
-                // Force the dark theme for that "moody" requirement
-                HWStarterRepoTheme(darkTheme = true) {
-                    // Surface provides the background color and fills the screen
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
-                    ) {
-                        GameListScreen()
-                    }
+            // Only one setContent block is needed!
+            HWStarterRepoTheme(darkTheme = true) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    GameListScreen()
                 }
             }
         }
