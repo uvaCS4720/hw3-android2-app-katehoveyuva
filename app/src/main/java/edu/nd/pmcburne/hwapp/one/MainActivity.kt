@@ -13,17 +13,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import edu.nd.pmcburne.hwapp.one.ui.theme.HWStarterRepoTheme
 
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import edu.nd.pmcburne.hwapp.one.ui.theme.screens.GameListScreen
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            HWStarterRepoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            setContent {
+                // Force the dark theme for that "moody" requirement
+                HWStarterRepoTheme(darkTheme = true) {
+                    // Surface provides the background color and fills the screen
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        GameListScreen()
+                    }
                 }
             }
         }
